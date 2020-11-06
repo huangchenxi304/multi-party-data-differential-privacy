@@ -11,7 +11,7 @@ from sklearn.naive_bayes import BernoulliNB
 # 数据数字化
 def dataDigitize(path):
     # 获得原始数据
-    adult_raw = pd.read_excel(path)
+    adult_raw = pd.read_csv(path)
 
     # 清理数据，删除缺失值
     adult_cleaned = adult_raw.dropna()
@@ -34,7 +34,6 @@ def dataDigitize(path):
             adult_digitization[column] = adult_cleaned[column].map(dict_data)
         else:
             adult_digitization[column] = adult_cleaned[column]
-
 
 
     return adult_digitization

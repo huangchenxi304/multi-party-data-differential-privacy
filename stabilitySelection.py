@@ -4,13 +4,15 @@ import pandas as pd
 from sklearn.linear_model import RandomizedLasso
 from sklearn.feature_selection import RFE
 from sklearn.linear_model import LinearRegression
-
+import adultSVM
+import adultSVM_noDummyVar
 
 def getData(path):
-    global data, labels
+
     data = d_SVM.dataDigitize(path)
     labels = data['Play?']
     data.drop("Play?", axis=1, inplace=True)
+    return data, labels
 
 
 def crossValidationPreparation(f):
@@ -29,7 +31,7 @@ def mySelection():
     features = []
 
     # 自定义阈值
-    threshold = 6
+    threshold = 5
     best_score = 0
     best_features = []
 
@@ -57,8 +59,8 @@ def mySelection():
     # print(d_SVM.runSvm(data[['Outlook', 'health', 'Humidity']],labels))
 
 
-def rlassoSS():
-    global data, labels
+def rlassoSS(data,labels):
+
     names = data.columns
     rlasso = RandomizedLasso(alpha=0.025)
     rlasso.fit(data, labels)
@@ -108,14 +110,19 @@ def calRecordCorr():
     print(matrix)
 
 
-getData("D:\学习\差分隐私\d1.xlsx")
+# getData("D:\学习\差分隐私\d1.xlsx")
 # 用pearson相关系数来计算记录相关性
 # c = data.transpose().corr()
 # print(c)
-calRecordCorr()
+# calRecordCorr()
 
-# rlassoSS()
-# getData("D:\学习\差分隐私\d2.xlsx")
-# rlassoSS()
+
+data, labels = getData("D:\学习\差分隐私\d(1).xlsx")
+#print(data,labels)
+rlassoSS(data, labels)
+
+
 # mySelection()
 # recursiveFeatureElimination()
+
+
