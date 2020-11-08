@@ -13,6 +13,7 @@ warnings.filterwarnings("ignore")
 # 获取原始数据
 data_raw = pd.read_csv("data/adult_new.csv")
 data = d_SVM.dataDigitize("data/adult_new.csv")
+data['fnlwgt'] = pd.cut(data['fnlwgt'],5)
 # data, labels, names = funcs.data_clean(data_raw)
 adjustment_features = ['hours-per-week', 'education-num', 'fnlwgt', 'age']
 data1 = data[adjustment_features]
@@ -103,8 +104,8 @@ mcd = MCD()
 def utilityFunction2(feature_names):
 
     cs_ci = funcs.cs(data[feature_names],mcd)['CS_i']
-    print(feature_names)
-    print(funcs.cs(data[feature_names],mcd))
+
+
     return MCD() / cs_ci
 
 
@@ -138,21 +139,15 @@ def selectCi1(privacy_budget, c, best_features):
     # 根据效用函数1选出的ci
     result1 = sorted(zip(map(lambda x: chanceExp1(privacy_budget, c, x), c), c), reverse=True)
     # 将选出的最佳ci加入best features
-    print(list(result1[0]))
-    best_features.extend(list(result1[0])[1])
+    return best_features + list(result1[0])[1]
 
-    return best_features
 
 def selectCi2(privacy_budget, c, best_features):
     # 根据效用函数2选出的ci
     result2 = sorted(zip(map(lambda x: chanceExp2(privacy_budget, c, x), c), c), reverse=True)
-    print(result2)
+
     # 将选出的最佳ci加入best features
-
-    best_features.extend(list(result2[0])[1])
-
-
-    return best_features
+    return best_features + list(result2[0])[1]
 
 
 
@@ -171,7 +166,7 @@ def MAE2(privacy_budget):
 
 
     u2 = algo_2_count.noise_count_error(data[result2], funcs.cs(data[result2],mcd)['CS_i'], privacy_budget)
-    print(funcs.cs(data[result2]))
+
     print(u2)
     return u2
 
@@ -185,14 +180,33 @@ def painting1(n):
     return x, y
 
 
+def painting2(n):
+    x = []
+    y = []
+    for i in range(n):
+        y.append(MAE2(i / n))
+        x.append(i / n)
+    fileObject = open('u1-y.txt', 'w')
+    for ip in y:
+        fileObject.write(ip)
+        fileObject.write('\n')
+    fileObject.close()
+    fileObject2 = open('u1-x.txt', 'w')
+    for ip in x:
+        fileObject2.write(ip)
+        fileObject2.write('\n')
+    fileObject2.close()
+    return x, y
+
 if __name__ == '__main__':
-    # n = 50
-    # x, y = painting1(n)
-    # plt.rcParams['font.sans-serif'] = 'SimHei'
-    # plt.xlabel('privacy_budget')
-    # plt.ylabel('MAE')
-    # plt.plot(x, y)
-    # plt.savefig("n = " + str(n))
-    # plt.show()
-    MAE1(1)
-    # MAE2(1)
+    n = 50
+    x1, y1 = painting1(n)
+    # x2, y2 = painting2(n)
+    plt.rcParams['font.sans-serif'] = 'SimHei'
+    plt.xlabel('privacy_budget')
+    plt.ylabel('MAE1')
+    plt.plot(x1, y1)
+    plt.savefig("n = " + str(n))
+    plt.show()
+
+
