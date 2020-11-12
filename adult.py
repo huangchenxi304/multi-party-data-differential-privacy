@@ -3,13 +3,15 @@ import d_SVM
 import itertools
 import algo_2_count
 import numpy as np
+
+import drawing_v3
 import funcs
 import warnings
 import pandas as pd
 import algorithm2_v3
 
 warnings.filterwarnings("ignore")
-data_titanic = d_SVM.dataDigitize("data/titanic.csv")
+# 获取原始数据
 data_raw = d_SVM.dataDigitize("data/adult_new.csv")
 # 将特征fnlwgt离散为5个维度
 data_raw['fnlwgt'] = pd.cut(data_raw['fnlwgt'], 5)
@@ -23,5 +25,4 @@ best_f = list((data2.drop('lable', axis=1)).columns)
 label = 'lable'
 
 
-algorithm2_v3.mae1(data_raw, 1, best_f, adjustment_f, label)
-algorithm2_v3.mae2(data_raw, 1, best_f, adjustment_f, label)
+drawing_v3.run_pic(10, 'adult', data_raw, adjustment_f, best_f, label)

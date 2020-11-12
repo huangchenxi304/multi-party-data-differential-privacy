@@ -17,9 +17,9 @@ def partition_c(adjustment_features, label):
 
 
 # 计算信息增益
-def gain_info(data_raw, feature_name):
+def gain_info(data_raw, feature_name, label):
     # 合并后数据集Dp的初始信息熵
-    info_entropy_dp = cal_info_entropy(data_raw)
+    info_entropy_dp = cal_info_entropy(data_raw, label)
 
     # 根据特征名称获取特征取值的count
     count_a_feature = data_raw[feature_name].value_counts()
@@ -28,7 +28,7 @@ def gain_info(data_raw, feature_name):
     subset = [data_raw.loc[data_raw[feature_name] == value] for value in count_a_feature._index]
 
     # 计算各子集的信息熵
-    subset_entropy = [cal_info_entropy(x) for x in subset]
+    subset_entropy = [cal_info_entropy(x, label) for x in subset]
 
     feature_chance = np.array([x / np.sum(count_a_feature) for x in count_a_feature])
 
@@ -37,7 +37,7 @@ def gain_info(data_raw, feature_name):
 
 
 # 计算信息熵
-def cal_info_entropy(data, data_label="lable"):
+def cal_info_entropy(data, data_label):
     # 计算标签取值count情况
     label_data = data[data_label].value_counts()
     # 计算标签取值概率
@@ -50,7 +50,7 @@ def cal_info_entropy(data, data_label="lable"):
 # 计算单个特征的信息增益的字典
 def gain_info_initialize(adjustment_features, label, data_raw):
     single_feature_gain_info = dict(
-        zip(adjustment_features, map(lambda x: gain_info(data_raw, x), adjustment_features)))
+        zip(adjustment_features, map(lambda x: gain_info(data_raw, x, label), adjustment_features)))
     single_feature_gain_info[label] = 0
     return single_feature_gain_info
 
@@ -133,12 +133,27 @@ def print_cs(name, data, threshold=0.5):
     print(funcs.cs(data, threshold))
 
 
-def mae1(data_raw, privacy_budget, best_f, adjustment_f, label):
+def initial_everything1(data_raw, adjustment_f, label):
+    global backup_solutions,gain_info_dict,u1_dict,mcd
     # 生成备选方案c
     backup_solutions = partition_c(adjustment_f, label)
     gain_info_dict = gain_info_initialize(adjustment_f, label, data_raw)
     u1_dict = u1_initialize(backup_solutions, gain_info_dict)
     mcd = get_mcd(data_raw)
+
+
+def initial_everything2(data_raw, adjustment_f, label):
+    global backup_solutions,u2_dict,mcd
+    # 生成备选方案c
+    backup_solutions = partition_c(adjustment_f, label)
+    mcd = get_mcd(data_raw)
+
+    # 生成u2字典
+    u2_dict = u2_initialize(data_raw, backup_solutions, mcd)
+
+def mae1(data_raw, privacy_budget, best_f):
+
+
 
     best_and_selected1 = select_ci1(1, backup_solutions, best_f, u1_dict)
     # print_cs('best+u1选出来的特征', data_raw[best_and_selected1])
@@ -156,20 +171,15 @@ def mae1(data_raw, privacy_budget, best_f, adjustment_f, label):
     mae_gs = algo_2_count.noise_count_error(data_raw[best_and_selected1],
                                             funcs.cs(data_raw[best_and_selected1])['GS'],
                                             privacy_budget)
-    print('u1' + str(u1))
-    print('u1cs' + str(mae_cs))
-    print('u1gs' + str(mae_gs))
+    print('u1:' + str(u1))
+    print('u1cs:' + str(mae_cs))
+    print('u1gs:' + str(mae_gs))
 
     return u1, mae_cs, mae_gs
 
 
-def mae2(data_raw, privacy_budget, best_f, adjustment_f, label):
-    # 生成备选方案c
-    backup_solutions = partition_c(adjustment_f, label)
-    mcd = get_mcd(data_raw)
+def mae2(data_raw, privacy_budget, best_f):
 
-    # 生成u2字典
-    u2_dict = u2_initialize(data_raw, backup_solutions, mcd)
 
     best_and_selected2 = select_ci2(1, backup_solutions, best_f, mcd, u2_dict)
 
@@ -189,8 +199,8 @@ def mae2(data_raw, privacy_budget, best_f, adjustment_f, label):
     mae_gs = algo_2_count.noise_count_error(data_raw[best_and_selected2],
                                             funcs.cs(data_raw[best_and_selected2])['GS'],
                                             privacy_budget)
-    print('u2' + str(u2))
-    print('u2cs' + str(mae_cs))
-    print('u2gs' + str(mae_gs))
+    print('u2:' + str(u2))
+    print('u2cs:' + str(mae_cs))
+    print('u2gs:' + str(mae_gs))
 
     return u2, mae_cs, mae_gs
