@@ -95,13 +95,11 @@ def utility_function1(feature_names):
 
 
 # n方数据集平均相关度
-def get_mcd():
-    n_party_data = [data1, data2]
-
-    return np.mean([funcs.cs(x)['CS_mean'] for x in n_party_data])
+def get_mcd(subdatas):
+    return np.mean([funcs.cs(x)['CS_mean'] for x in subdatas])
 
 
-mcd = get_mcd()
+mcd = get_mcd(funcs.split(data_raw, 3))
 
 
 # 计算u2字典
@@ -159,27 +157,68 @@ def select_ci2(privacy_budget, c, best_features):
     return best_features + list(selected_features2[0])[1]
 
 
+# 打印lyc要的cs
+def print_cs(name, data, threshold=0.5):
+    print(name + ':(阈值为 %s )' % threshold)
+    print(data.columns)
+    print(funcs.cs(data, threshold))
+
+
 def mae1(privacy_budget):
-    best_and_selected1 = select_ci1(1, partition_c(adjustment_f), best_f)
+    best_and_selected1 = select_ci1(1, backup_solutions, best_f)
+
+    # print_cs('best+u1选出来的特征', data_raw[best_and_selected1])
+    # print_cs('best+u1选出来的特征', data_raw[best_and_selected1], float(mcd))
 
     u1 = algo_2_count.noise_count_error(data_raw[best_and_selected1],
                                         funcs.cs(data_raw[best_and_selected1], mcd)['CS_i'],
                                         privacy_budget)
-    print(u1)
-    return u1
+
+    # cs,阈值为默认0.5
+    mae_cs = algo_2_count.noise_count_error(data_raw[best_and_selected1],
+                                            funcs.cs(data_raw[best_and_selected1])['CS_i'],
+                                            privacy_budget)
+    # GS，阈值为默认0.5
+    mae_gs = algo_2_count.noise_count_error(data_raw[best_and_selected1],
+                                            funcs.cs(data_raw[best_and_selected1])['GS'],
+                                            privacy_budget)
+    print('u1' + str(u1))
+    print('u1cs' + str(mae_cs))
+    print('u1gs' + str(mae_gs))
+
+    return u1, mae_cs, mae_gs
 
 
 def mae2(privacy_budget):
-    best_and_selected2 = select_ci2(1, partition_c(adjustment_f), best_f)
+    best_and_selected2 = select_ci2(1, backup_solutions, best_f)
 
+    # print_cs('best+u2选出来的特征', data_raw[best_and_selected2])
+    # print_cs('best+u2选出来的特征', data_raw[best_and_selected2], float(mcd))
+
+    # 我们的算法，使用mcd为阈值
     u2 = algo_2_count.noise_count_error(data_raw[best_and_selected2],
                                         funcs.cs(data_raw[best_and_selected2], mcd)['CS_i'],
                                         privacy_budget)
 
-    print(u2)
-    return u2
+    # cs,阈值为默认0.5
+    mae_cs = algo_2_count.noise_count_error(data_raw[best_and_selected2],
+                                            funcs.cs(data_raw[best_and_selected2])['CS_i'],
+                                            privacy_budget)
+    # GS，阈值为默认0.5
+    mae_gs = algo_2_count.noise_count_error(data_raw[best_and_selected2],
+                                            funcs.cs(data_raw[best_and_selected2])['GS'],
+                                            privacy_budget)
+    print('u2' + str(u2))
+    print('u2cs' + str(mae_cs))
+    print('u2gs' + str(mae_gs))
+
+    return u2, mae_cs, mae_gs
 
 
 if __name__ == '__main__':
-    mae1(1)
+    # print_cs('所有特征', data_raw)
+    # print_cs('所有特征', data_raw, float(mcd))
+    #
+    # mae1(1)
     # mae2(1)
+    print(mcd)
