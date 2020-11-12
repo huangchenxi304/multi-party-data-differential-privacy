@@ -1,14 +1,8 @@
 # 获取原始数据
 import d_SVM
-import itertools
-import algo_2_count
-import numpy as np
-
 import drawing_v3
-import funcs
 import warnings
 import pandas as pd
-import algorithm2_v3
 
 warnings.filterwarnings("ignore")
 # 获取原始数据

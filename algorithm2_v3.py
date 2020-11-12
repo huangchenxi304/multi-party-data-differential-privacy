@@ -8,9 +8,9 @@ warnings.filterwarnings("ignore")
 
 
 # 根据调整特征系数对调整特征集的特征进行组合，生成备选方案
-def partition_c(adjustment_features, label):
+def partition_c(adjustment_features, label, b):
     # 两两组合，返回备选方案c
-    c_raw = [list(i) for i in itertools.combinations(adjustment_features, 2)]
+    c_raw = [list(i) for i in itertools.combinations(adjustment_features, b)]
     for x in c_raw:
         x.append(label)
     return c_raw
@@ -133,19 +133,19 @@ def print_cs(name, data, threshold=0.5):
     print(funcs.cs(data, threshold))
 
 
-def initial_everything1(data_raw, adjustment_f, label):
+def initial_everything1(data_raw, adjustment_f, label, b):
     global backup_solutions,gain_info_dict,u1_dict,mcd
     # 生成备选方案c
-    backup_solutions = partition_c(adjustment_f, label)
+    backup_solutions = partition_c(adjustment_f, label, b)
     gain_info_dict = gain_info_initialize(adjustment_f, label, data_raw)
     u1_dict = u1_initialize(backup_solutions, gain_info_dict)
     mcd = get_mcd(data_raw)
 
 
-def initial_everything2(data_raw, adjustment_f, label):
+def initial_everything2(data_raw, adjustment_f, label, b):
     global backup_solutions,u2_dict,mcd
     # 生成备选方案c
-    backup_solutions = partition_c(adjustment_f, label)
+    backup_solutions = partition_c(adjustment_f, label, b)
     mcd = get_mcd(data_raw)
 
     # 生成u2字典

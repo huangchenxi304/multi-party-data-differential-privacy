@@ -16,4 +16,4 @@ data2 = data_raw.drop(adjustment_f, axis=1)
 best_f = ['pclass', 'sex', 'age', 'sibsp', 'alive', 'adult_male']
 label = 'survived'
 
-drawing_v3.run_pic(10, 'titanic', data_raw, adjustment_f, best_f, label)
+drawing_v3.run_pic(10, 'titanic', data_raw, adjustment_f, best_f, label, 4)
