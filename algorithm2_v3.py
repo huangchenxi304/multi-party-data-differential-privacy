@@ -140,24 +140,23 @@ def initial_everything1(data_raw, adjustment_f, label, b):
     gain_info_dict = gain_info_initialize(adjustment_f, label, data_raw)
     u1_dict = u1_initialize(backup_solutions, gain_info_dict)
     mcd = get_mcd(data_raw)
+    print('mcd:'+str(mcd))
 
 
 def initial_everything2(data_raw, adjustment_f, label, b):
-    global backup_solutions,u2_dict,mcd
+    global backup_solutions,u2_dict
     # 生成备选方案c
     backup_solutions = partition_c(adjustment_f, label, b)
-    mcd = get_mcd(data_raw)
-
     # 生成u2字典
     u2_dict = u2_initialize(data_raw, backup_solutions, mcd)
 
+
 def mae1(data_raw, privacy_budget, best_f):
 
-
-
     best_and_selected1 = select_ci1(1, backup_solutions, best_f, u1_dict)
-    # print_cs('best+u1选出来的特征', data_raw[best_and_selected1])
-    # print_cs('best+u1选出来的特征', data_raw[best_and_selected1], float(mcd))
+
+    print_cs('best+u1选出来的特征', data_raw[best_and_selected1])
+    print_cs('best+u1选出来的特征', data_raw[best_and_selected1], float(mcd))
 
     u1 = algo_2_count.noise_count_error(data_raw[best_and_selected1],
                                         funcs.cs(data_raw[best_and_selected1], mcd)['CS_i'],
@@ -171,9 +170,9 @@ def mae1(data_raw, privacy_budget, best_f):
     mae_gs = algo_2_count.noise_count_error(data_raw[best_and_selected1],
                                             funcs.cs(data_raw[best_and_selected1])['GS'],
                                             privacy_budget)
-    print('u1:' + str(u1))
-    print('u1cs:' + str(mae_cs))
-    print('u1gs:' + str(mae_gs))
+    # print('u1:' + str(u1))
+    # print('u1cs:' + str(mae_cs))
+    # print('u1gs:' + str(mae_gs))
 
     return u1, mae_cs, mae_gs
 
@@ -183,8 +182,8 @@ def mae2(data_raw, privacy_budget, best_f):
 
     best_and_selected2 = select_ci2(1, backup_solutions, best_f, mcd, u2_dict)
 
-    # print_cs('best+u2选出来的特征', data_raw[best_and_selected2])
-    # print_cs('best+u2选出来的特征', data_raw[best_and_selected2], float(mcd))
+    print_cs('best+u2选出来的特征', data_raw[best_and_selected2])
+    print_cs('best+u2选出来的特征', data_raw[best_and_selected2], float(mcd))
 
     # 我们的算法，使用mcd为阈值
     u2 = algo_2_count.noise_count_error(data_raw[best_and_selected2],
@@ -199,8 +198,8 @@ def mae2(data_raw, privacy_budget, best_f):
     mae_gs = algo_2_count.noise_count_error(data_raw[best_and_selected2],
                                             funcs.cs(data_raw[best_and_selected2])['GS'],
                                             privacy_budget)
-    print('u2:' + str(u2))
-    print('u2cs:' + str(mae_cs))
-    print('u2gs:' + str(mae_gs))
+    # print('u2:' + str(u2))
+    # print('u2cs:' + str(mae_cs))
+    # print('u2gs:' + str(mae_gs))
 
     return u2, mae_cs, mae_gs

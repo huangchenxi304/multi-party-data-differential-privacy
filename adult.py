@@ -19,4 +19,4 @@ best_f = list((data2.drop('lable', axis=1)).columns)
 label = 'lable'
 
 
-drawing_v3.run_pic(10, 'adult', data_raw, adjustment_f, best_f, label)
+drawing_v3.run_pic(10, 'adult', data_raw, adjustment_f, best_f, label, 2)
